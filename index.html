@@ -353,25 +353,7 @@ $('camBtn').onclick=async()=>{
   if(!reader){status('No cargó el motor de lectura. Revisa tu conexión o usa un lector USB.',true);return;}
   $('viewer').hidden=false;camOn=true;$('camBtn').lastChild.textContent='Detener cámara';status('Apunta al código de barras o DataMatrix de la etiqueta…');
   try{
-const devices = await ZXing.BrowserCodeReader.listVideoInputDevices();
-
-await reader.decodeFromVideoDevice(
-    devices[0].deviceId,
-    'video',
-    (result, err) => {
-
-        if (result) {
-
-            handle(result.getText(), { fromCam:true });
-
-            status(
-                'Leído: ' +
-                result.getText().split(GS).join(' ') +
-                ' · sigue apuntando para leer otro'
-            );
-        }
-    }
-);
+    await reader.decodeFromConstraints({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}},$('video'),(r)=>{if(r){handle(r.getText(),{fromCam:true});status('Leído: '+r.getText().split(GS).join(' ')+'  · sigue apuntando para leer otro');}});
   }catch(e){
     stopCam();
     status('La cámara en vivo no está disponible aquí (permiso denegado o vista restringida). Usa “Leer desde foto”, que abre la cámara del teléfono.',true);
